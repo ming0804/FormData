@@ -1,0 +1,50 @@
+function FormDataNameValuePairs(FormName) {
+    var FormDaytaObject={};
+    var FormElement=$('#'+FormName).get(0);
+
+    if (IsSafariBrowser())
+    {
+        var FormElementCollection=FormElement.elements;
+        //console.log('namedItem='+FormElementCollection.namedItem('KEY'));
+        var JQEle,EleType;
+        for (ele=0; (ele < FormElementCollection.length); ele++) {
+            JQEle=$(FormElementCollection.item(ele));
+            EleType=JQEle.attr('type');
+
+            // https://github.com/jimmywarting/FormData/blob/master/FormData.js
+            if ((! JQEle.attr('name')) ||
+                (((EleType == 'checkbox') || (EleType == 'radio')) &&
+                    (! JQEle.prop('checked'))))
+                continue;
+
+            let tempValue = JQEle.val();
+            if(tempValue instanceof Array ){
+                var tempValue1 = "";
+                for(var i = 0;i<tempValue.length; i++){
+                    if(i == (tempValue.length -1)){
+                        tempValue1 += tempValue[i] ;
+                    }else {
+                        tempValue1 += tempValue[i] +",";
+                    }
+                }
+                tempValue = tempValue1;
+            }
+            FormDaytaObject[JQEle.attr('name')]=tempValue;
+        }
+    }
+    else
+    {
+        var FormDayta=new FormData(FormElement);
+        for (var fld of FormDayta.entries())
+            FormDaytaObject[fld[0]]=fld[1];
+    }
+
+    return FormDaytaObject;
+}
+
+function IsSafariBrowser()
+{
+    var VendorName=window.navigator.vendor;
+    return ((VendorName.indexOf('Apple') > -1) &&
+        (window.navigator.userAgent.indexOf('Safari') > -1));
+}
